@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Как ты записан</title>
+    <title>Контакты Миши</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -36,21 +36,21 @@
                     <div class="stat-card">
                         <div class="stat-icon">👥</div>
                         <div class="stat-info">
-                            <div class="stat-number">4</div>
-                            <div class="stat-label">контакта</div>
+                            <div class="stat-number">7</div>
+                            <div class="stat-label">контактов</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">📊</div>
                         <div class="stat-info">
-                            <div class="stat-number" id="viewCount">127</div>
+                            <div class="stat-number" id="viewCount">247</div>
                             <div class="stat-label">просмотров</div>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⭐</div>
                         <div class="stat-info">
-                            <div class="stat-number">4.9</div>
+                            <div class="stat-number">4.8</div>
                             <div class="stat-label">рейтинг</div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@
                 </div>
 
                 <!-- Кнопка вызова списка -->
-                <div class="button-container">
+                <div class="button-container" id="buttonContainer">
                     <button class="reveal-btn" onclick="revealContacts()">
                         <span class="btn-text">Узнать как записан</span>
                         <div class="btn-shine"></div>
@@ -81,13 +81,14 @@
                 <!-- Список контактов -->
                 <div class="contacts-container" id="contactsContainer">
                     <div class="contacts-list">
+                        <!-- Основные контакты -->
                         <div class="contact-item">
                             <div class="contact-avatar">
                                 <div class="avatar-icon">👨‍💼</div>
                             </div>
                             <div class="contact-info">
                                 <h3>Миша парень</h3>
-                                <p class="contact-status">+79*********</p>
+                                <p class="contact-status">+79*******92</p>
                             </div>
                             <div class="contact-badge">Основной</div>
                         </div>
@@ -98,7 +99,7 @@
                             </div>
                             <div class="contact-info">
                                 <h3>Миша лучший друг</h3>
-                                <p class="contact-status">+79*********</p>
+                                <p class="contact-status">+79*******21</p>
                             </div>
                             <div class="contact-badge">Друг</div>
                         </div>
@@ -109,7 +110,7 @@
                             </div>
                             <div class="contact-info">
                                 <h3>Клоун 🤡</h3>
-                                <p class="contact-status">+79*********</p>
+                                <p class="contact-status">+79*******45</p>
                             </div>
                             <div class="contact-badge">Аноним</div>
                         </div>
@@ -120,10 +121,58 @@
                             </div>
                             <div class="contact-info">
                                 <h3>Сын</h3>
-                                <p class="contact-status">+79*********</p>
+                                <p class="contact-status">+79*******29</p>
                             </div>
                             <div class="contact-badge">Семья</div>
                         </div>
+
+                        <!-- Друзья -->
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <div class="avatar-icon">💕</div>
+                            </div>
+                            <div class="contact-info">
+                                <h3>Краш)</h3>
+                                <p class="contact-status">+79*******32</p>
+                            </div>
+                            <div class="contact-badge">Любовь</div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <div class="avatar-icon">👯</div>
+                            </div>
+                            <div class="contact-info">
+                                <h3>Гоша друг</h3>
+                                <p class="contact-status">+79*******85</p>
+                            </div>
+                            <div class="contact-badge">Друг</div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-avatar">
+                                <div class="avatar-icon">🎮</div>
+                            </div>
+                            <div class="contact-info">
+                                <h3>Серёга Школа</h3>
+                                <p class="contact-status">+79*******56</p>
+                            </div>
+                            <div class="contact-badge">Гейминг</div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка скрыть - такого же дизайна -->
+                    <div class="button-container" id="hideButtonContainer">
+                        <button class="reveal-btn hide-btn" onclick="hideContacts()">
+                            <b><span class="btn-text">Скрыть</span></b>
+                            <div class="btn-shine"></div>
+                            <div class="btn-particles">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </button>
                     </div>
                 </div>
 
@@ -133,39 +182,8 @@
                         <h3>👀 Недавно смотрели</h3>
                         <div class="online-dot"></div>
                     </div>
-                    <div class="views-list">
-                        <div class="view-item">
-                            <div class="viewer-avatar">A</div>
-                            <div class="viewer-info">
-                                <div class="viewer-name">@alinawa78</div>
-                                <div class="view-action">посмотрела как записана</div>
-                            </div>
-                            <div class="view-time">только что</div>
-                        </div>
-                        <div class="view-item">
-                            <div class="viewer-avatar">М</div>
-                            <div class="viewer-info">
-                                <div class="viewer-name">@misha_friend</div>
-                                <div class="view-action">просмотрел как записан</div>
-                            </div>
-                            <div class="view-time">2 мин назад</div>
-                        </div>
-                        <div class="view-item">
-                            <div class="viewer-avatar">К</div>
-                            <div class="viewer-info">
-                                <div class="viewer-name">@katya_love</div>
-                                <div class="view-action">посмотрела как записана</div>
-                            </div>
-                            <div class="view-time">5 мин назад</div>
-                        </div>
-                        <div class="view-item">
-                            <div class="viewer-avatar">Д</div>
-                            <div class="viewer-info">
-                                <div class="viewer-name">@dima_bro</div>
-                                <div class="view-action">посмотрел как записан</div>
-                            </div>
-                            <div class="view-time">10 мин назад</div>
-                        </div>
+                    <div class="views-list" id="viewsList">
+                        <!-- Сюда будут добавляться рандомные просмотры -->
                     </div>
                 </div>
 
@@ -186,4 +204,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-
