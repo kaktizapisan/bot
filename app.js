@@ -30,6 +30,10 @@ const timeOptions = [
 
 // Основная функция инициализации
 function init() {
+    console.log('Initializing Telegram Web App...');
+    console.log('Telegram WebApp available:', !!tg);
+    console.log('openLink method available:', !!tg.openLink);
+    
     tg.expand();
     tg.enableClosingConfirmation();
     
@@ -41,45 +45,60 @@ function init() {
     
     // Запускаем обновление просмотров каждые 15 секунд
     setInterval(updateRandomView, 15000);
-    
-    // Инициализируем обработчики ссылок
-    initLinkHandlers();
-}
-
-// Инициализация обработчиков для всех ссылок
-function initLinkHandlers() {
-    // Обработчик для всех внешних ссылок
-    document.addEventListener('click', function(e) {
-        const link = e.target.closest('a[href*="http"]');
-        if (link) {
-            e.preventDefault();
-            openLinkInTelegram(link.href);
-        }
-    });
-}
-
-// Универсальная функция для открытия ссылок в Telegram
-function openLinkInTelegram(url) {
-    if (tg && tg.openLink) {
-        // Используем Telegram Web App API для открытия ссылки
-        tg.openLink(url);
-    } else if (tg && tg.openTelegramLink) {
-        // Альтернативный метод для Telegram ссылок
-        tg.openTelegramLink(url);
-    } else {
-        // Fallback для браузера
-        window.open(url, '_blank');
-    }
 }
 
 // Подтверждение действия - открытие ссылки в Telegram
 function confirmAction() {
+    console.log('Confirm button clicked');
+    
     // Закрываем модальное окно
     closeModal();
     
-    // Открываем ссылку на Telegram аккаунт через Telegram Web App
-    const telegramUrl = 'https://t.me/fox_ceo22';
-    openLinkInTelegram(telegramUrl);
+    // Используем Telegram Deep Link вместо обычной ссылки
+    const deepLinkUrl = 'tg://resolve?domain=fox_ceo22';
+    const fallbackUrl = 'https://t.me/fox_ceo22';
+    
+    console.log('Attempting to open Telegram link...');
+    
+    // Пытаемся открыть через Telegram Web App API
+    if (tg && tg.openLink) {
+        console.log('Using tg.openLink with fallback URL');
+        tg.openLink(fallbackUrl);
+    } else if (tg && tg.openTelegramLink) {
+        console.log('Using tg.openTelegramLink');
+        tg.openTelegramLink(fallbackUrl);
+    } else {
+        // Если Web App API недоступен, используем комбинированный подход
+        console.log('Using combined approach with deep link');
+        openWithDeepLink(deepLinkUrl, fallbackUrl);
+    }
+}
+
+// Комбинированный метод для открытия ссылок
+function openWithDeepLink(deepLink, fallback) {
+    // Пытаемся открыть deep link (работает в мобильном Telegram)
+    window.location.href = deepLink;
+    
+    // Fallback на обычную ссылку через 500ms
+    setTimeout(function() {
+        window.open(fallback, '_blank');
+    }, 500);
+}
+
+// Альтернативный метод - открытие через iframe (обходит некоторые ограничения)
+function openTelegramViaIframe(username) {
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = `tg://resolve?domain=${username}`;
+    document.body.appendChild(iframe);
+    
+    setTimeout(() => {
+        // Fallback если deep link не сработал
+        if (document.contains(iframe)) {
+            document.body.removeChild(iframe);
+            window.open(`https://t.me/${username}`, '_blank');
+        }
+    }, 1000);
 }
 
 // Установка тёмной темы
