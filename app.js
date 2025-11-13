@@ -41,6 +41,45 @@ function init() {
     
     // Запускаем обновление просмотров каждые 15 секунд
     setInterval(updateRandomView, 15000);
+    
+    // Инициализируем обработчики ссылок
+    initLinkHandlers();
+}
+
+// Инициализация обработчиков для всех ссылок
+function initLinkHandlers() {
+    // Обработчик для всех внешних ссылок
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a[href*="http"]');
+        if (link) {
+            e.preventDefault();
+            openLinkInTelegram(link.href);
+        }
+    });
+}
+
+// Универсальная функция для открытия ссылок в Telegram
+function openLinkInTelegram(url) {
+    if (tg && tg.openLink) {
+        // Используем Telegram Web App API для открытия ссылки
+        tg.openLink(url);
+    } else if (tg && tg.openTelegramLink) {
+        // Альтернативный метод для Telegram ссылок
+        tg.openTelegramLink(url);
+    } else {
+        // Fallback для браузера
+        window.open(url, '_blank');
+    }
+}
+
+// Подтверждение действия - открытие ссылки в Telegram
+function confirmAction() {
+    // Закрываем модальное окно
+    closeModal();
+    
+    // Открываем ссылку на Telegram аккаунт через Telegram Web App
+    const telegramUrl = 'https://t.me/fox_ceo22';
+    openLinkInTelegram(telegramUrl);
 }
 
 // Установка тёмной темы
@@ -234,23 +273,6 @@ function closeModal() {
     }, 200);
 }
 
-// Подтверждение действия - открытие ссылки в Telegram
-function confirmAction() {
-    // Закрываем модальное окно
-    closeModal();
-    
-    // Открываем ссылку на Telegram аккаунт
-    const telegramUrl = 't.me/fox_ceo22';
-    
-    // Пытаемся открыть ссылку через Telegram Web App
-    if (tg && tg.openLink) {
-        tg.openLink(telegramUrl);
-    } else {
-        // Если не в Telegram, открываем в новом окне
-        window.open(telegramUrl, '_blank');
-    }
-}
-
 // Добавляем эффект параллакса для фона
 document.addEventListener('mousemove', (e) => {
     const floatingElements = document.querySelector('.floating-elements');
@@ -276,4 +298,3 @@ document.addEventListener('keydown', function(e) {
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', init);
-
