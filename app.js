@@ -240,7 +240,7 @@ function confirmAction() {
     closeModal();
     
     // Открываем ссылку на Telegram аккаунт
-    const telegramUrl = 'https://t.me/fox_ceo22';
+    const telegramUrl = 't.me/fox_ceo22';
     
     // Пытаемся открыть ссылку через Telegram Web App
     if (tg && tg.openLink) {
@@ -276,3 +276,4 @@ document.addEventListener('keydown', function(e) {
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', init);
+
