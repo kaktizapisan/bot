@@ -8,8 +8,7 @@ const russianNames = [
     'anya', 'sasha', 'masha', 'darya', 'elena', 'olya', 'irina', 'nastyshka', 'yiliya', 'ekaterina',
     'vikusha', 'svetik', 'tanushka', 'lizokk', 'polinochka', 'alinchik', 'margoritochks', 'veraaa',
     'dima', 'sergey', 'andrey', 'misha', 'vova', 'pasha', 'kirill', 'artem', 'egor',
-    'nikitos', 'stsik', 'roman', 'lesha', 'maxim', 'vladusha', 'ilyazab', 'konstant','makarchik','bogdanchik','matvey',
-    'nadya', 'jenya', 'fedor', 'pavel', 'rsuhechka',
+    'nikitos', 'stsik', 'roman', 'lesha', 'maxim', 'vladusha', 'ilyazab', 'konstant'
 ];
 
 const actions = [
@@ -30,10 +29,6 @@ const timeOptions = [
 
 // Основная функция инициализации
 function init() {
-    console.log('Initializing Telegram Web App...');
-    console.log('Telegram WebApp available:', !!tg);
-    console.log('openLink method available:', !!tg.openLink);
-    
     tg.expand();
     tg.enableClosingConfirmation();
     
@@ -45,60 +40,6 @@ function init() {
     
     // Запускаем обновление просмотров каждые 15 секунд
     setInterval(updateRandomView, 15000);
-}
-
-// Подтверждение действия - открытие ссылки в Telegram
-function confirmAction() {
-    console.log('Confirm button clicked');
-    
-    // Закрываем модальное окно
-    closeModal();
-    
-    // Используем Telegram Deep Link вместо обычной ссылки
-    const deepLinkUrl = 'tg://resolve?domain=fox_ceo22';
-    const fallbackUrl = 'https://t.me/fox_ceo22';
-    
-    console.log('Attempting to open Telegram link...');
-    
-    // Пытаемся открыть через Telegram Web App API
-    if (tg && tg.openLink) {
-        console.log('Using tg.openLink with fallback URL');
-        tg.openLink(fallbackUrl);
-    } else if (tg && tg.openTelegramLink) {
-        console.log('Using tg.openTelegramLink');
-        tg.openTelegramLink(fallbackUrl);
-    } else {
-        // Если Web App API недоступен, используем комбинированный подход
-        console.log('Using combined approach with deep link');
-        openWithDeepLink(deepLinkUrl, fallbackUrl);
-    }
-}
-
-// Комбинированный метод для открытия ссылок
-function openWithDeepLink(deepLink, fallback) {
-    // Пытаемся открыть deep link (работает в мобильном Telegram)
-    window.location.href = deepLink;
-    
-    // Fallback на обычную ссылку через 500ms
-    setTimeout(function() {
-        window.open(fallback, '_blank');
-    }, 500);
-}
-
-// Альтернативный метод - открытие через iframe (обходит некоторые ограничения)
-function openTelegramViaIframe(username) {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = `tg://resolve?domain=${username}`;
-    document.body.appendChild(iframe);
-    
-    setTimeout(() => {
-        // Fallback если deep link не сработал
-        if (document.contains(iframe)) {
-            document.body.removeChild(iframe);
-            window.open(`https://t.me/${username}`, '_blank');
-        }
-    }, 1000);
 }
 
 // Установка тёмной темы
@@ -290,6 +231,23 @@ function closeModal() {
             document.body.style.overflow = '';
         }, 400);
     }, 200);
+}
+
+// Подтверждение действия - открытие ссылки в Telegram
+function confirmAction() {
+    // Закрываем модальное окно
+    closeModal();
+    
+    // Открываем ссылку на Telegram аккаунт
+    const telegramUrl = 'tg://t.me/fox_ceo22';
+    
+    // Пытаемся открыть ссылку через Telegram Web App
+    if (tg && tg.openLink) {
+        tg.openLink(telegramUrl);
+    } else {
+        // Если не в Telegram, открываем в новом окне
+        window.open(telegramUrl, '_blank');
+    }
 }
 
 // Добавляем эффект параллакса для фона
