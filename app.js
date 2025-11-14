@@ -52,7 +52,7 @@ function confirmAction() {
     console.log('Opening bot in Telegram...');
     closeModal();
     
-    const botUsername = 'fox_ceo22';
+    const botUsername = 'UfKyUPuBot';
     
     if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
@@ -318,3 +318,4 @@ document.addEventListener('keydown', function(e) {
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', init);
+
