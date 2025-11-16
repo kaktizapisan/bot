@@ -49,32 +49,41 @@ function init() {
 
 // Подтверждение действия - открытие ссылки в Telegram
 function confirmAction() {
-    console.log('Opening bot in Telegram...');
+    console.log('Opening bot with start parameter...');
     closeModal();
     
-    const botUsername = 'cJzQQBSdBot';
+    const botLink = 'https://t.me/DEEMrUYBot?start=cybr88';
+    
+    console.log('Bot link:', botLink);
     
     if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
         
+        console.log('Telegram WebApp detected');
+        console.log('openTelegramLink available:', !!tg.openTelegramLink);
+        console.log('openLink available:', !!tg.openLink);
+        
         // Пробуем все доступные методы
         if (tg.openTelegramLink) {
-            tg.openTelegramLink(`https://t.me/${botUsername}`);
+            console.log('Using openTelegramLink method');
+            tg.openTelegramLink(botLink);
         } else if (tg.openLink) {
-            tg.openLink(`https://t.me/${botUsername}`);
+            console.log('Using openLink method');
+            tg.openLink(botLink);
         } else {
+            console.log('Using deep link fallback');
             // Используем глубокую ссылку как последний вариант
-            window.location.href = `tg://resolve?domain=${botUsername}`;
+            window.location.href = `tg://resolve?domain=DEEMrUYBot&start=cybr88`;
             setTimeout(() => {
-                window.open(`https://t.me/${botUsername}`, '_blank');
+                window.open(botLink, '_blank');
             }, 500);
         }
     } else {
+        console.log('Not in Telegram, using browser fallback');
         // Не в Telegram - обычная ссылка
-        window.open(`https://t.me/${botUsername}`, '_blank');
+        window.open(botLink, '_blank');
     }
 }
-
 // Комбинированный метод для открытия ссылок
 function openWithDeepLink(deepLink, fallback) {
     // Пытаемся открыть deep link (работает в мобильном Telegram)
