@@ -33,7 +33,7 @@ function init() {
     // Устанавливаем тёмную цветовую схему
     setPurpleTheme();
     
-    // Устанавливаем имя пользователя
+    // Устанавливаем имя пользователя с анимацией
     setUserName();
     
     // Инициализируем счетчик просмотров
@@ -46,6 +46,9 @@ function init() {
     const hideButtonContainer = document.getElementById('hideButtonContainer');
     hideButtonContainer.classList.add('hidden');
     
+    // Запускаем дополнительные анимации после загрузки
+    setTimeout(startAdditionalAnimations, 1000);
+    
     // Запускаем обновление просмотров каждые 15 секунд
     setInterval(updateRandomView, 15000);
 }
@@ -57,7 +60,7 @@ function setPurpleTheme() {
     document.documentElement.style.setProperty('--tg-theme-button-color', 'var(--accent-blue)');
 }
 
-// Функция для установки имени пользователя
+// Функция для установки имени пользователя с улучшенной анимацией
 function setUserName() {
     const user = tg.initDataUnsafe?.user;
     let userName = 'Пользователь';
@@ -83,7 +86,35 @@ function setUserName() {
         console.log('Ошибка при получении имени пользователя:', error);
     }
     
-    document.getElementById('userName').textContent = userName;
+    const userNameElement = document.getElementById('userName');
+    userNameElement.textContent = userName;
+    
+    // Добавляем анимацию для имени
+    setTimeout(() => {
+        userNameElement.style.animation = 'nameGlow 3s ease-in-out infinite';
+    }, 1000);
+}
+
+// Дополнительные анимации после загрузки
+function startAdditionalAnimations() {
+    const button = document.querySelector('.reveal-btn');
+    const greeting = document.querySelector('.greeting');
+    
+    // Периодическая пульсация кнопки
+    setInterval(() => {
+        button.style.animation = 'buttonPulse 2s ease-in-out';
+        setTimeout(() => {
+            button.style.animation = '';
+        }, 2000);
+    }, 10000); // Каждые 10 секунд
+    
+    // Легкое мерцание приветствия
+    setInterval(() => {
+        greeting.style.transform = 'scale(1.02)';
+        setTimeout(() => {
+            greeting.style.transform = 'scale(1)';
+        }, 300);
+    }, 15000); // Каждые 15 секунд
 }
 
 // Инициализация счетчика просмотров
