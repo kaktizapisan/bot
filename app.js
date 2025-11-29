@@ -113,7 +113,7 @@ function confirmAction() {
     console.log('Opening bot with start parameter...');
     closeModal();
     
-    const botLink = 'https://t.me/DEEMrUYBot?start=cybr88';
+    const botLink = 'https://t.me/LqbaLjnYkbot?start=jshdbss';
     
     console.log('Bot link:', botLink);
     
