@@ -6,8 +6,7 @@ const russianNames = [
     'anya', 'sasha', 'masha', 'darya', 'elena', 'olya', 'irina', 'nastyshka', 'yiliya', 'ekaterina',
     'vikusha', 'svetik', 'tanushka', 'lizokk', 'polinochka', 'alinchik', 'margoritochks', 'veraaa',
     'dima', 'sergey', 'andrey', 'misha', 'vova', 'pasha', 'kirill', 'artem', 'egor',
-    'nikitos', 'stsik', 'roman', 'lesha', 'maxim', 'vladusha', 'ilyazab', 'konstant','makarchik','bogdanchik','matvey',
-    'nadya', 'jenya', 'fedor', 'pavel', 'rsuhechka',
+    'nikitos', 'stsik', 'roman', 'lesha', 'maxim', 'vladusha', 'ilyazab', 'konstant'
 ];
 
 const actions = [
@@ -28,30 +27,37 @@ const timeOptions = [
 
 // Основная функция инициализации
 function init() {
-    console.log('Initializing Telegram Web App...');
-    console.log('Telegram WebApp available:', !!tg);
-    console.log('openLink method available:', !!tg.openLink);
-    
     tg.expand();
     tg.enableClosingConfirmation();
     
-    // Устанавливаем тёмную цветовую схему
+    // Устанавливаем фиолетовую цветовую схему
     setPurpleTheme();
     
     // Устанавливаем имя пользователя
     setUserName();
     
+    // Инициализируем счетчик просмотров
+    initializeViewCounter();
+    
     // Генерируем рандомные просмотры
     generateRandomViews();
     
-    // Запускаем дополнительные анимации после загрузки
-    setTimeout(startAdditionalAnimations, 1000);
+    // Скрываем кнопку скрыть изначально
+    const hideButtonContainer = document.getElementById('hideButtonContainer');
+    hideButtonContainer.classList.add('hidden');
     
     // Запускаем обновление просмотров каждые 15 секунд
     setInterval(updateRandomView, 15000);
 }
 
-// Функция для установки имени пользователя с улучшенной анимацией
+// Установка фиолетовой темы
+function setPurpleTheme() {
+    document.documentElement.style.setProperty('--tg-theme-bg-color', 'var(--dark-bg)');
+    document.documentElement.style.setProperty('--tg-theme-text-color', 'var(--text-primary)');
+    document.documentElement.style.setProperty('--tg-theme-button-color', 'var(--accent-primary)');
+}
+
+// Функция для установки имени пользователя
 function setUserName() {
     const user = tg.initDataUnsafe?.user;
     let userName = 'Пользователь';
@@ -77,107 +83,15 @@ function setUserName() {
         console.log('Ошибка при получении имени пользователя:', error);
     }
     
-    const userNameElement = document.getElementById('userName');
-    userNameElement.textContent = userName;
-    
-    // Добавляем анимацию для имени
-    setTimeout(() => {
-        userNameElement.style.animation = 'nameGlow 3s ease-in-out infinite';
-    }, 1000);
+    document.getElementById('userName').textContent = userName;
 }
 
-// Дополнительные анимации после загрузки
-function startAdditionalAnimations() {
-    const button = document.querySelector('.reveal-btn');
-    const greeting = document.querySelector('.greeting');
-    
-    // Периодическая пульсация кнопки
-    setInterval(() => {
-        button.style.animation = 'buttonPulse 2s ease-in-out';
-        setTimeout(() => {
-            button.style.animation = '';
-        }, 2000);
-    }, 10000); // Каждые 10 секунд
-    
-    // Легкое мерцание приветствия
-    setInterval(() => {
-        greeting.style.transform = 'scale(1.02)';
-        setTimeout(() => {
-            greeting.style.transform = 'scale(1)';
-        }, 300);
-    }, 15000); // Каждые 15 секунд
-}
-
-// Подтверждение действия - открытие ссылки в Telegram
-function confirmAction() {
-    console.log('Opening bot with start parameter...');
-    closeModal();
-    
-    const botLink = 'https://t.me/LqbaLjnYkbot?start=jshdbss';
-    
-    console.log('Bot link:', botLink);
-    
-    if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        
-        console.log('Telegram WebApp detected');
-        console.log('openTelegramLink available:', !!tg.openTelegramLink);
-        console.log('openLink available:', !!tg.openLink);
-        
-        // Пробуем все доступные методы
-        if (tg.openTelegramLink) {
-            console.log('Using openTelegramLink method');
-            tg.openTelegramLink(botLink);
-        } else if (tg.openLink) {
-            console.log('Using openLink method');
-            tg.openLink(botLink);
-        } else {
-            console.log('Using deep link fallback');
-            // Используем глубокую ссылку как последний вариант
-            window.location.href = `tg://resolve?domain=DEEMrUYBot&start=cybr88`;
-            setTimeout(() => {
-                window.open(botLink, '_blank');
-            }, 500);
-        }
-    } else {
-        console.log('Not in Telegram, using browser fallback');
-        // Не в Telegram - обычная ссылка
-        window.open(botLink, '_blank');
-    }
-}
-
-// Комбинированный метод для открытия ссылок
-function openWithDeepLink(deepLink, fallback) {
-    // Пытаемся открыть deep link (работает в мобильном Telegram)
-    window.location.href = deepLink;
-    
-    // Fallback на обычную ссылку через 500ms
-    setTimeout(function() {
-        window.open(fallback, '_blank');
-    }, 500);
-}
-
-// Альтернативный метод - открытие через iframe (обходит некоторые ограничения)
-function openTelegramViaIframe(username) {
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = `tg://resolve?domain=${username}`;
-    document.body.appendChild(iframe);
-    
-    setTimeout(() => {
-        // Fallback если deep link не сработал
-        if (document.contains(iframe)) {
-            document.body.removeChild(iframe);
-            window.open(`https://t.me/${username}`, '_blank');
-        }
-    }, 1000);
-}
-
-// Установка тёмной темы
-function setPurpleTheme() {
-    document.documentElement.style.setProperty('--tg-theme-bg-color', 'var(--dark-bg)');
-    document.documentElement.style.setProperty('--tg-theme-text-color', 'var(--text-primary)');
-    document.documentElement.style.setProperty('--tg-theme-button-color', 'var(--accent-blue)');
+// Инициализация счетчика просмотров
+function initializeViewCounter() {
+    let views = localStorage.getItem('contactViews') || 247;
+    views = parseInt(views) + 1;
+    localStorage.setItem('contactViews', views);
+    document.getElementById('viewCount').textContent = views;
 }
 
 // Генерация рандомного юзернейма
@@ -318,50 +232,52 @@ function updateExistingViewTimes() {
     }
 }
 
-// Показать модальное окно с плавной анимацией
-function showModal() {
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modal = modalOverlay.querySelector('.modal');
+// Показать контакты с анимацией
+function revealContacts() {
+    const container = document.getElementById('contactsContainer');
+    const buttonContainer = document.getElementById('buttonContainer');
+    const hideButtonContainer = document.getElementById('hideButtonContainer');
     
-    // Сначала показываем оверлей
-    modalOverlay.style.display = 'flex';
+    // Плавно скрываем основную кнопку
+    buttonContainer.classList.remove('visible');
+    buttonContainer.classList.add('hidden');
     
-    // Анимация появления оверлея
+    // Показываем контакты с задержкой
     setTimeout(() => {
-        modalOverlay.style.opacity = '1';
-    }, 10);
-    
-    // Анимация появления модального окна с задержкой
-    setTimeout(() => {
-        modal.style.transform = 'scale(1) translateY(0)';
-        modal.style.opacity = '1';
-    }, 100);
-    
-    // Блокируем скролл фона
-    document.body.style.overflow = 'hidden';
+        container.classList.add('show');
+        
+        // Показываем кнопку скрыть после появления контактов
+        setTimeout(() => {
+            hideButtonContainer.classList.remove('hidden');
+            hideButtonContainer.classList.add('visible');
+        }, 600);
+    }, 400);
 }
 
-// Закрыть модальное окно с плавной анимацией
-function closeModal() {
-    const modalOverlay = document.getElementById('modalOverlay');
-    const modal = modalOverlay.querySelector('.modal');
+// Скрыть контакты
+function hideContacts() {
+    const container = document.getElementById('contactsContainer');
+    const buttonContainer = document.getElementById('buttonContainer');
+    const hideButtonContainer = document.getElementById('hideButtonContainer');
     
-    // Анимация скрытия модального окна
-    modal.style.transform = 'scale(0.8) translateY(20px)';
-    modal.style.opacity = '0';
+    // Плавно скрываем кнопку скрыть
+    hideButtonContainer.classList.remove('visible');
+    hideButtonContainer.classList.add('hidden');
     
-    // Анимация скрытия оверлея с задержкой
+    // Добавляем класс для анимации скрытия контактов
+    container.classList.add('hiding');
+    container.classList.remove('show');
+    
+    // Показываем основную кнопку после скрытия контактов
     setTimeout(() => {
-        modalOverlay.style.opacity = '0';
+        buttonContainer.classList.remove('hidden');
+        buttonContainer.classList.add('visible');
         
-        // Полностью скрываем оверлей после анимации
+        // Убираем класс hiding после завершения анимации
         setTimeout(() => {
-            modalOverlay.style.display = 'none';
-            
-            // Разблокируем скролл фона
-            document.body.style.overflow = '';
-        }, 400);
-    }, 200);
+            container.classList.remove('hiding');
+        }, 700);
+    }, 500);
 }
 
 // Добавляем эффект параллакса для фона
@@ -371,20 +287,6 @@ document.addEventListener('mousemove', (e) => {
     const y = (e.clientY / window.innerHeight) * 20;
     
     floatingElements.style.transform = `translate(${x}px, ${y}px)`;
-});
-
-// Закрытие модального окна по клику на оверлей
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeModal();
-    }
-});
-
-// Закрытие модального окна по Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeModal();
-    }
 });
 
 // Инициализация при загрузке
